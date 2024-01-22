@@ -100,6 +100,7 @@ def get_response(
     temperature: float = 0,
 ):
     print("file name is ", file_name)
+    file_name=file_name.split("/")[-1]
     """
     Generate a response using a conversational model.
 
@@ -138,9 +139,8 @@ def get_response(
     if file_name.endswith(".docx"):
         loader=Docx2txtLoader(file_path=file_name.split("/")[-1])
     else:
-        loader = PyPDFLoader("example_data/layout-parser-paper.pdf")
+        loader = PyPDFLoader(file_name)
 
-        
     # 1.load data
     data = loader.load()
     # 2.split data so it can fit gpt token limit
