@@ -1,8 +1,7 @@
 import requests
 import json
 
-BACKEND_URL="https://silver-space-potato-765xp4pr66rfw6jv-8000.app.github.dev"
-
+BACKEND_URL="https://psychic-adventure-p4w6pqpgxw9c6gp6-8000.app.github.dev"
 
 def chat(user_input, data, session_id=None):
     """
@@ -116,12 +115,14 @@ st.divider()
 # Process the uploaded file if available
 if data_file is not None:
     # Save the file temporarily
-    file_path = os.path.join("temp", data_file.name)
+    file_path = os.path.join("/workspaces/advanced-python-projects-build-ai-applications-4465602/Start/temp", data_file.name)
     with open(file_path, "wb") as f:
         f.write(data_file.getbuffer())
 
     # Upload the file to a specified API endpoint
     s3_upload_url = upload_file(file_path=file_path)
+    
+    s3_upload_url=s3_upload_url.split("/")[-1]
 
     # Display chat messages from history on app rerun
     for message in st.session_state.messages:

@@ -18,7 +18,7 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_openai import OpenAIEmbeddings
 from langchain_community.vectorstores import FAISS
 # from langchain_community.document_loaders import S3FileLoader
-from langchain_community.document_loaders import Docx2txtLoader
+from langchain_community.document_loaders import Docx2txtLoader,PyPDFLoader
 
 
 from langchain_community.callbacks import get_openai_callback
@@ -43,14 +43,20 @@ if os.name == "nt":  # Windows
     load_dotenv(".secrets.env")
 
 # Retrieve and assign environment variables to variables
-S3_KEY = os.environ.get("S3_KEY")  # AWS S3 access key
-S3_SECRET = os.environ.get("S3_SECRET")  # AWS S3 secret access key
-S3_BUCKET = os.environ.get("S3_BUCKET")  # AWS S3 bucket name
-S3_REGION = os.environ.get("S3_REGION")  # AWS S3 region
-OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")  # OpenAI API key
-MONGO_URL = os.environ.get("MONGO_URL")  # MongoDB connection URL
-S3_PATH = os.environ.get("S3_PATH")  # AWS S3 path
+# S3_KEY = os.environ.get("S3_KEY")  # AWS S3 access key
+# S3_SECRET = os.environ.get("S3_SECRET")  # AWS S3 secret access key
+# S3_BUCKET = os.environ.get("S3_BUCKET")  # AWS S3 bucket name
+# S3_REGION = os.environ.get("S3_REGION")  # AWS S3 region
+# OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")  # OpenAI API key
+# MONGO_URL = os.environ.get("MONGO_URL")  # MongoDB connection URL
+# S3_PATH = os.environ.get("S3_PATH")  # AWS S3 pathi
 
+os.environ['OPENAI_API_KEY']="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"
+S3_KEY="AKIARMZIQE2E5XWYSAWH"
+S3_SECRET="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"
+S3_BUCKET="docchat"
+S3_REGION="us-east-1"
+S3_PATH="documents/"
 
 
 try:
@@ -73,7 +79,7 @@ except:
     fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
     # Print information about the exception type, filename, and line number
     print(exc_type, fname, exc_tb.tb_lineno)
-    
+
 
 
 
@@ -121,7 +127,7 @@ def get_response(
     """
     embeddings = OpenAIEmbeddings()  # load embeddings
     # download file from s3
-    wr.s3.download(path=file_name,local_file=file_name.split("/")[-1],boto3_session=aws_s3)
+    wr.s3.download(path=f"s3://docchat/documents/{file_name}",local_file=file_name,boto3_session=aws_s3)
 
     # loader = S3FileLoader(
     #     bucket=S3_BUCKET,
@@ -129,7 +135,12 @@ def get_response(
     #     aws_access_key_id=S3_KEY,
     #     aws_secret_access_key=S3_SECRET,
     # )
-    loader=Docx2txtLoader(file_path=file_name.split("/")[-1])
+    if file_name.endswith(".docx"):
+        loader=Docx2txtLoader(file_path=file_name.split("/")[-1])
+    else:
+        loader = PyPDFLoader("example_data/layout-parser-paper.pdf")
+
+        
     # 1.load data
     data = loader.load()
     # 2.split data so it can fit gpt token limit
@@ -236,9 +247,6 @@ def add_session_history(session_id: str, new_values: List):
                 "conversation": new_values,
             }  # to initiate a history under a newsession, note we uses insert_one
         )
-
-
-
 
 
 # Create a FastAPI application
@@ -365,19 +373,20 @@ async def uploadtos3(data_file: UploadFile):
     Raises:
         HTTPException: If the file specified in `data_file` is not found (HTTP status code 404).
     """
+    print(data_file.filename.split("/")[-1])
     try:
         with open(f"{data_file.filename}", "wb") as out_file:
             content = await data_file.read()  # async read
             out_file.write(content)  # async write
         wr.s3.upload(
             local_file=data_file.filename,
-            path=f"s3://{S3_BUCKET}/{S3_PATH}{data_file.filename}",
+            path=f"s3://{S3_BUCKET}/{S3_PATH}{data_file.filename.split('/')[-1]}",
             boto3_session=aws_s3,
         )
         os.remove(data_file.filename)
         response = {
-            "filename": data_file.filename,
-            "file_path": f"s3://{S3_BUCKET}/{S3_PATH}{data_file.filename}",
+            "filename": data_file.filename.split("/")[-1],
+            "file_path": f"s3://{S3_BUCKET}/{S3_PATH}{data_file.filename.split('/')[-1]}",
         }
 
     except FileNotFoundError:
