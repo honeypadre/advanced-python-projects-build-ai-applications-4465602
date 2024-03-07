@@ -195,16 +195,16 @@ def load_memory_to_pass(session_id: str):
     data = conversationcol.find_one(
         {"session_id": session_id}
     )  # find the document with the session id
-    history = []  # create empty array (incase we do not have any history)
+    history = []  # create empty array (in case we do not have any history)
     if data:  # check if data is not None
         data = data["conversation"]  # get the conversation field
 
         for x in range(0, len(data), 2):  # iterate over the field
             history.extend(
                 [(data[x], data[x + 1])]
-            )  # our history is expected format is [(human_message,ai_message)] , the even index has human message and odd has ai response
+            )  # our history is expected format is [(human_message,ai_message)] , the even index has human message and odd has AI response
     print(history)
-    return history  # retun history
+    return history  # return history
 
 
 def get_session() -> str:
@@ -245,7 +245,7 @@ def add_session_history(session_id: str, new_values: List):
             {
                 "session_id": session_id,
                 "conversation": new_values,
-            }  # to initiate a history under a newsession, note we uses insert_one
+            }  # to initiate a history under a new session, note we uses insert_one
         )
 
 
