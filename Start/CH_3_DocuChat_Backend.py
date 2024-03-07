@@ -32,7 +32,7 @@ import awswrangler as wr  # Import AWS Wrangler for working with AWS services
 
 import boto3  # Import the boto3 library for interacting with AWS services
 
-# Import the os module for system-related operations
+# Import the OS module for system-related operations
 
 # Check if the operating system is Windows
 if os.name == "nt":  # Windows
@@ -141,18 +141,18 @@ def get_response(
     else:
         loader = PyPDFLoader(file_name)
 
-    # 1.load data
+    # 1. load data
     data = loader.load()
-    # 2.split data so it can fit gpt token limit
+    # 2. split data so it can fit GPT token limit
     print("splitting ..")
     text_splitter = RecursiveCharacterTextSplitter(
         chunk_size=1000, chunk_overlap=0, separators=["\n", " ", ""]
     )
 
     all_splits = text_splitter.split_documents(data)
-    # 3. store data in vector db to conduct searc
+    # 3. store data in vector db to conduct search
     vectorstore = FAISS.from_documents(all_splits, embeddings)
-    # 4. Init openai
+    # 4. init OpenAI
     llm = ChatOpenAI(model_name=model, temperature=temperature)
 
     # 5. pass the data to openai chain using vector db
