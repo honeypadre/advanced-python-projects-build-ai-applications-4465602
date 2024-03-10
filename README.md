@@ -8,6 +8,7 @@ All of the course files are stored in the main branch. There are 2 folders in th
 Happy Coding!
 
 Please follow me on LinkedIn: https://www.linkedin.com/in/priya123mohan
+
 [0]: # (Replace these placeholder URLs with actual course URLs)
 
 [lil-course-url]: https://www.linkedin.com/learning/
