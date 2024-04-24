@@ -52,11 +52,11 @@ if os.name == "nt":  # Windows
 # S3_PATH = os.environ.get("S3_PATH")  # AWS S3 pathi
 
 os.environ['OPENAI_API_KEY']="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"
-S3_KEY="AKIARMZIQE2E5XWYSAWH"
-S3_SECRET="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"
-S3_BUCKET="docchat"
-S3_REGION="us-east-1"
-S3_PATH="documents/"
+S3_KEY=""
+S3_SECRET=""
+S3_BUCKET=""
+S3_REGION=""
+S3_PATH=""
 
 
 try:
